@@ -24,7 +24,7 @@ public class Modal extends GridPane {
             AnchorPane parent,
             FlowPane gridPane,
             Card newOrgCard,
-            OrganizationCard orgCard,
+            OrganizerCard orgCard,
             Stage stage) {
 
         setStyle("-fx-background-color: rgba(0, 0, 0, 0.5)");
@@ -90,7 +90,7 @@ public class Modal extends GridPane {
         Label pathLabel = new Label("Path");
         pathLabel.setStyle("-fx-text-fill: #FFF; -fx-font-family: Inter; -fx-font-weight: 600; -fx-font-size: 16");
         TextField pathInputField = new TextField();
-        pathInputField.setPromptText("/path/to/your/documents");
+        pathInputField.setPromptText("/path/to/your/folder");
         if (organizerDetail != null) pathInputField.setText(organizerDetail.getPath());
         DirectoryChooser folderChooser = new DirectoryChooser();
         folderChooser.setInitialDirectory(new File(System.getProperty("user.home")));
@@ -122,7 +122,7 @@ public class Modal extends GridPane {
         Button saveButton = new Button("Save");
         saveButton.setStyle("-fx-background-color: #2B6CB0; -fx-text-fill: #FFF; -fx-font-size: 14; -fx-font-weight: 600; -fx-font-family: Inter;-fx-cursor: hand");
         saveButton.setPrefSize(100, 33);
-        saveButton.setOnMouseClicked(_ -> {
+        saveButton.setOnMouseClicked(e -> {
             // your save logic here
             System.out.println("Organization saved: " + textInput.getText());
 
@@ -134,13 +134,12 @@ public class Modal extends GridPane {
 
             gridPane.getChildren().clear();
             OrganizerService service = new OrganizerService();
-            List<Organizer> organizations = service.GetAll();
-            for (Organizer organizer : organizations) {
-                OrganizationCard card = new OrganizationCard(organizer, parent, gridPane, stage);
+            List<Organizer> organizers = service.GetAll();
+            for (Organizer organizer : organizers) {
+                OrganizerCard card = new OrganizerCard(organizer, parent, gridPane, stage, newOrgCard);
                 gridPane.getChildren().add(card);
             }
-            Card card = new Card("Add New Group", null);
-            gridPane.getChildren().add(card);
+            gridPane.getChildren().add(newOrgCard);
             parent.getChildren().remove(this);
         });
         AnchorPane.setRightAnchor(saveButton,16.0);
@@ -155,17 +154,16 @@ public class Modal extends GridPane {
             deleteButton.setStyle("-fx-background-color: #dc3333; -fx-text-fill: #FFF; -fx-cursor: hand; -fx-background-radius: 5px;");
             trashImage.setLayoutY(2);
             trashImage.setLayoutX(2);
-            deleteButton.setOnMouseClicked(_ -> {
+            deleteButton.setOnMouseClicked(e -> {
                 delete(organizerDetail.getId());
                 gridPane.getChildren().clear();
                 OrganizerService service = new OrganizerService();
                 List<Organizer> organizations = service.GetAll();
                 for (Organizer organizer : organizations) {
-                    OrganizationCard card = new OrganizationCard(organizer, parent, gridPane, stage);
+                    OrganizerCard card = new OrganizerCard(organizer, parent, gridPane, stage, newOrgCard);
                     gridPane.getChildren().add(card);
                 }
-                Card card = new Card("Add New Group", null);
-                gridPane.getChildren().add(card);
+                gridPane.getChildren().add(newOrgCard);
                 parent.getChildren().remove(this);
             });
             deleteButton.getChildren().add(trashImage);

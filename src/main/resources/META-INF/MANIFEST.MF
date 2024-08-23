@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Main-Class: com.onursedef.mopperjavafx.App
+Class-Path: javafx-controls-22-ea+11-win.jar javafx-fxml-22-ea+11.jar sq
+ lite-jdbc-3.41.2.2.jar javafx-graphics-22-ea+11.jar javafx-graphics-22-
+ ea+11-win.jar javafx-base-22-ea+11-win.jar javafx-controls-22-ea+11.jar
+  FXTrayIcon-4.2.0.jar javafx-base-22-ea+11.jar ikonli-javafx-12.3.1.jar
+  ikonli-core-12.3.1.jar javafx-fxml-22-ea+11-win.jar javafx-swing-19.ja
+ r javafx-swing-19-win.jar
+Created-By: Onur Sedef <onrsedef@gmail.com>

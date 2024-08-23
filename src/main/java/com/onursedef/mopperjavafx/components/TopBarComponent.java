@@ -1,5 +1,6 @@
 package com.onursedef.mopperjavafx.components;
 
+import com.onursedef.mopperjavafx.FolderService;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -42,6 +43,11 @@ public class TopBarComponent extends AnchorPane {
         startButton.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
         AnchorPane.setRightAnchor(startButton, 20.0);
         AnchorPane.setTopAnchor(startButton, 15.0);
+        startButton.setOnMouseClicked(e -> {
+            FolderService service = new FolderService();
+            service.createFolders();
+            service.moveFiles();
+        });
 
         setStyle("-fx-background-color: #1A365D");
         setPrefSize(getWidth(), 70);

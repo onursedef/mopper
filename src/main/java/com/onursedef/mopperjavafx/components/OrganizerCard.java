@@ -10,10 +10,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-public class OrganizationCard extends VBox {
+public class OrganizerCard extends VBox {
     private Label cardTitle;
 
-    public OrganizationCard(Organizer organizer, AnchorPane parent, FlowPane grid, Stage stage) {
+    public OrganizerCard(Organizer organizer, AnchorPane parent, FlowPane grid, Stage stage, Card newOrgCard) {
         setMaxSize(135, 225);
         AnchorPane rect = new AnchorPane();
         rect.setPrefSize(135, 195);
@@ -31,14 +31,14 @@ public class OrganizationCard extends VBox {
         cardTitle.setMaxWidth(93);
         cardTitle.setTextAlignment(TextAlignment.CENTER);
         rect.getChildren().addAll(cardImage, cardTitle);
-        rect.setOnMouseEntered(_ -> rect.setStyle("-fx-background-color: #2C5282; -fx-background-radius: 10px;"));
-        rect.setOnMouseExited(_ -> rect.setStyle("-fx-background-color: #2B6CB0; -fx-background-radius: 10px;"));
-        rect.setOnMouseClicked(_ -> {
+        rect.setOnMouseEntered(e -> rect.setStyle("-fx-background-color: #2C5282; -fx-background-radius: 10px;"));
+        rect.setOnMouseExited(e -> rect.setStyle("-fx-background-color: #2B6CB0; -fx-background-radius: 10px;"));
+        rect.setOnMouseClicked(e -> {
             Modal modal = new Modal(
                     organizer,
                     parent,
                     grid,
-                    null,
+                    newOrgCard,
                     this,
                     stage);
             System.out.println(organizer.toString());

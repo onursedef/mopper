@@ -1,26 +1,22 @@
 package com.onursedef.mopperjavafx;
-
 import com.onursedef.mopperjavafx.components.Card;
 import com.onursedef.mopperjavafx.components.Modal;
-import com.onursedef.mopperjavafx.components.OrganizationCard;
+import com.onursedef.mopperjavafx.components.OrganizerCard;
 import com.onursedef.mopperjavafx.components.TopBarComponent;
 import com.onursedef.mopperjavafx.model.Organizer;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -49,9 +45,10 @@ public class MainApplication extends Application {
                 card,
                 null,
                 stage);
-        List<Organizer> organizers = getConnection();
+        OrganizerService service = new OrganizerService();
+        List<Organizer>  organizers = service.GetAll();
         for (Organizer organizer : organizers) {
-            OrganizationCard card1 = new OrganizationCard(organizer, pane, flowPane, stage);
+            OrganizerCard card1 = new OrganizerCard(organizer, pane, flowPane, stage, card);
             flowPane.getChildren().add(card1);
         }
         flowPane.getChildren().add(card);
@@ -60,18 +57,21 @@ public class MainApplication extends Application {
         vbox.setLayoutY(0);
         pane.getChildren().add(vbox);
         // show modal on card click
-        card.setOnMouseClicked(_ -> pane.getChildren().add(modal));
+        card.setOnMouseClicked(e -> pane.getChildren().add(modal));
 
         vbox.prefWidthProperty().bind(pane.widthProperty());
         vbox.prefHeightProperty().bind(pane.heightProperty());
         Scene scene = new Scene(pane, 1280, 720);
-
         loadFonts();
 
-        scene.setFill(Color.TRANSPARENT);
-        stage.setTitle("Hello!");
-        stage.setScene(scene);
+        SystemTray();
 
+        scene.setFill(Color.TRANSPARENT);
+        stage.setTitle("Mopper - File Organizer");
+        stage.getIcons().add(
+                new Image(getClass().getResource("logo.png").toExternalForm())
+        );
+        stage.setScene(scene);
         stage.show();
     }
 
@@ -87,45 +87,53 @@ public class MainApplication extends Application {
         Font.loadFont(Objects.requireNonNull(MainApplication.class.getResource("assets/fonts/Inter-Thin.ttf")).toExternalForm(), 10);
     }
 
-    private List<Organizer> getConnection() throws SQLException {
-        Connection connection = DriverManager.getConnection("jdbc:sqlite:" + getClass().getResource("db/mopper.db").toExternalForm());
-
-        String query = "SELECT * FROM organizers";
-        List<Organizer> organizers = new ArrayList<>();
-        try (connection) {
-            PreparedStatement statement = connection.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                organizers.add(new Organizer(
-                        resultSet.getInt("id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("extensions"),
-                        resultSet.getString("path")
-                ));
-            }
-        } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(
-                    Level.SEVERE,
-                    LocalDateTime.now() + ": Could not load organizations from database \n {}", e);
-            organizers.clear();
-        }
-
-        return organizers;
-    }
-
-    private static boolean checkDrivers() {
+    private void SystemTray() {
         try {
-            Class.forName("org.sqlite.JDBC");
-            DriverManager.registerDriver(new org.sqlite.JDBC());
-            return true;
-        } catch (ClassNotFoundException | SQLException classNotFoundException) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not start SQLite Drivers");
-            return false;
+            final PopupMenu menu = new PopupMenu();
+            final URL url = MainApplication.class.getResource("assets/logo.png");
+            java.awt.Image image = Toolkit.getDefaultToolkit().getImage(url);
+            final TrayIcon trayIcon = new TrayIcon(image);
+            final SystemTray tray = SystemTray.getSystemTray();
+
+            MenuItem start = new MenuItem("Start");
+            MenuItem exit = new MenuItem("Exit");
+
+            menu.add(start);
+            menu.addSeparator();
+            menu.add(exit);
+
+            trayIcon.setPopupMenu(menu);
+            trayIcon.setToolTip("Mopper - File Organizer Tool");
+
+            start.addActionListener(e -> {
+                FolderService service = new FolderService();
+                service.createFolders();
+                service.moveFiles();
+            });
+
+            exit.addActionListener(e -> {
+                // Stop Application
+                Platform.exit();
+                System.exit(0);
+            });
+
+            tray.add(trayIcon);
+        } catch (AWTException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static void main(String[] args) {
-
+    public static void main() {
+        FolderService service = new FolderService();
         launch();
+        while(true) {
+            service.createFolders();
+            service.moveFiles();
+            try {
+                Thread.sleep((long) 3.6e+6);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
