@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { open } from '@tauri-apps/plugin-dialog';
 import { desktopDir } from '@tauri-apps/api/path';
 
-export default function OrganizerModal({ organizer, id, isOpen, toggle }: { organizer: any | null, id: number | null, isOpen: boolean, toggle: () => void }) {
+export default function OrganizerModal({ organizer, id, isOpen }: { organizer: any | null, id: number | null, isOpen: boolean  }) {
     const [name, setName] = useState(organizer?.name || "");
     const [sourcePath, setSourcePath] = useState(organizer?.source_path || "");
     const [destPath, setDestPath] = useState(organizer?.destination_path || "");
@@ -12,6 +12,11 @@ export default function OrganizerModal({ organizer, id, isOpen, toggle }: { orga
     const [regex, setRegex] = useState(organizer?.regex || "");
     const [isShowingFiles, setIsShowingFiles] = useState(false);
     const [organizerInfo, setOrganizerInfo] = useState<any>(null);
+    const [modalOpen, setModalOpen] = useState(isOpen);
+
+    const toggle = () => {
+        setModalOpen(!modalOpen);
+    }
 
     const addNewOrganizer = async () => {
         var organizer = {

@@ -58,7 +58,7 @@ function App() {
     <div className="h-screen overflow-hidden select-none">
       <Titlebar />
       <div className="absolute top-11 left-0 right-0 bottom-0 overflow-auto">
-        <Navbar organizerCount={organizers.length} readFile={updateOrganizers} />
+        <Navbar organizerCount={organizers.length} />
         <Content organizers={organizers} />
         <div className="absolute bottom-0 left-0 right-0 bg-blue-900 border-t border-blue-600 px-3 py-1 max-h-10">
           <div className="inline-flex gap-4 items-center justify-end text-sm">

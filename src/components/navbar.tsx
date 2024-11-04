@@ -1,4 +1,4 @@
-import { Plus, Download, Upload, ChevronDown, Cog, Play, X } from "lucide-react";
+import { Plus, Cog, Play } from "lucide-react";
 import { useState, useEffect } from "react";
 import Logo from "@/assets/logo.svg";
 import OrganizerModal from "./atomic/organizerModal";
@@ -6,7 +6,7 @@ import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import SettingsModal from "./atomic/settingsModal";
 
-export default function Navbar({ organizerCount, readFile }: { organizerCount: number, readFile: () => void }) {
+export default function Navbar({ organizerCount }: { organizerCount: number }) {
 
     // const [dropdownOpen, setDropdownOpen] = useState(false);
     // const [isExport, setIsExport] = useState(false);
@@ -146,7 +146,7 @@ export default function Navbar({ organizerCount, readFile }: { organizerCount: n
                     </li>
                 </ul>
             </div> */}
-            <OrganizerModal isOpen={addModelOpen} toggle={newModelToggle} organizer={null} id={null} />
+            <OrganizerModal isOpen={addModelOpen} organizer={null} id={null} />
             <SettingsModal isOpen={settingsModalOpen} toggle={settingsModalToggle} />
         </>
     )

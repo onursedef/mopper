@@ -1,5 +1,4 @@
-import { Folder, FolderPlus } from "lucide-react";
-import OrganizerModal from "./organizerModal";
+import { Folder } from "lucide-react";
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -21,6 +20,7 @@ export default function Card({
         setOrganizerInfo(organizerInfo);
         setIsOpen(!isOpen);
     }
+    console.log(organizerInfo);
     return (
         <>
             <div className="flex flex-col gap-3 transition-all bg-blue-600 border-blue-700 hover:bg-blue-500 border rounded-lg lg:w-40 lg:h-56 sm:w-36 sm:h-52 xl:w-36 xl:h-52 2xl:w-40 3xl:w-48 3xl:h-64 4xl:w-[200px] 4xl:h-72 cursor-pointer" onClick={toggleModal}>

@@ -28,7 +28,7 @@ export default function Content({ organizers, }: { organizers: any[] }) {
                     )}
                 </div>
             </div>
-            <OrganizerModal id={selectedOrganizerId} organizer={organizerInfo} isOpen={isOpen} toggle={toggleModal} />
+            <OrganizerModal id={selectedOrganizerId} organizer={organizerInfo} isOpen={isOpen} />
         </>
     )
 }
