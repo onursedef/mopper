@@ -37,6 +37,12 @@ struct OrganizerFile {
     is_file: bool,
 }
 
+#[derive(Serialize, Deserialize)]
+struct Config {
+    timer: u64,
+    run_on_startup: bool,
+}
+
 #[tauri::command]
 fn read_file() -> Vec<Organizer> {
     let data = std::fs::read_to_string("data/mopper").expect("Unable to read file");
@@ -176,19 +182,32 @@ async fn run_organizer() -> bool {
     true
 }
 
+#[tauri::command]
+async fn set_config(config: Config) {
+    let new_data = serde_yaml::to_string(&config).expect("Unable to serialize data");
+    std::fs::write("data/mopper_config", new_data).expect("Unable to write file");
+}
+
+#[tauri::command]
+async fn get_config() -> Config {
+    let data = std::fs::read_to_string("data/mopper_config").expect("Unable to read file");
+    let config: Config = serde_yaml::from_str(&data).expect("Unable to parse file");
+    config
+}
+
 async fn organize_files(
     running: Arc<Mutex<bool>>,
     _notify: Arc<Notify>,
     app_handle: tauri::AppHandle,
 ) {
-    let mut isFinished = false;
+    let mut is_finished = false;
     loop {
         let running = running.lock().await;
         if !*running {
             break;
         }
         drop(running);
-        isFinished = false;
+        is_finished = false;
 
         app_handle
             .emit("organize_files_task", json!({"finished": false}))
@@ -261,10 +280,11 @@ async fn organize_files(
         app_handle
             .emit("organize_files_task", json!({"finished": true}))
             .unwrap();
-        isFinished = true;
-        if isFinished {
-            for i in 0..301 {
-                let total = 300;
+        is_finished = true;
+        let time = get_config().await.timer * 60;
+        if is_finished {
+            for i in 0..time + 1 {
+                let total = time;
                 tokio::time::sleep(Duration::from_secs(1)).await;
                 app_handle
                     .emit("time_to_left", json!({"time": total - i}))
@@ -280,6 +300,7 @@ pub fn run() {
     let notify = Arc::new(Notify::new());
 
     tauri::Builder::default()
+        // .plugin(tauri_plugin_autostart::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
@@ -291,12 +312,34 @@ pub fn run() {
             update_organizer,
             delete_organizer,
             run_organizer,
-            get_organizer_files
+            get_organizer_files,
+            set_config,
+            get_config
         ])
         .setup({
             let running = Arc::clone(&running);
             let notify = Arc::clone(&notify);
             move |app| {
+                #[cfg(desktop)]
+                {
+                    use tauri_plugin_autostart::MacosLauncher;
+                    use tauri_plugin_autostart::ManagerExt;
+
+                    app.handle().plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec![""])));
+
+                    let autostart_manager = app.autolaunch();
+
+                    // read config 
+                    let config = tauri::async_runtime::block_on(get_config());
+
+                    if config.run_on_startup {
+                        autostart_manager.enable().expect("Failed to enable autostart");
+                        println!("registered for autostart? {}", autostart_manager.is_enabled().unwrap());
+                    } else {
+                        autostart_manager.disable().expect("Failed to disable autostart");
+                    }
+                }
+
                 let run_i = MenuItem::with_id(app, "run", "Run", true, None::<&str>)?;
                 let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
                 let menu = Menu::with_items(app, &[&run_i, &quit_i])?;

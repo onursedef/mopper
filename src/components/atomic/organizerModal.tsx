@@ -16,9 +16,13 @@ export default function OrganizerModal({ organizer, id, isOpen }: { organizer: a
 
     const toggle = () => {
         setModalOpen(!modalOpen);
+        document.location.reload();
     }
 
     const addNewOrganizer = async () => {
+        if (name === "" || sourcePath === "" || destPath === "" || extensions === "" || regex === "") {
+            return;
+        }
         var organizer = {
             name,
             source_path: sourcePath,
@@ -35,6 +39,9 @@ export default function OrganizerModal({ organizer, id, isOpen }: { organizer: a
     }
 
     const updateOrganizer = async (key: number) => {
+        if (name === "" || sourcePath === "" || destPath === "" || extensions === "" || regex === "") {
+            return;
+        }
         var organizer = {
             name,
             source_path: sourcePath,
@@ -118,29 +125,29 @@ export default function OrganizerModal({ organizer, id, isOpen }: { organizer: a
                                 <div className="flex flex-col gap-4 mt-6">
                                     <div className="flex flex-col items-start gap-2">
                                         <label htmlFor="name">Name <span className="text-red-500 text-xs align-top">* required</span></label>
-                                        <input type="text" onChange={(e) => setName(e.target.value)} className="outline-none bg-[#2C5282] p-2 w-full rounded-md placeholder:text-gray-300 border-none" placeholder="e.g. Documents" />
+                                        <input type="text" onChange={(e) => setName(e.target.value)} className="outline-none bg-[#2C5282] p-2 w-full rounded-md placeholder:text-gray-300 border-none" placeholder="e.g. Documents" autoComplete="off" />
                                     </div>
                                     <div className="flex flex-col items-start gap-2">
                                         <label htmlFor="path">Source Path <span className="text-red-500 text-xs align-top">* required</span></label>
                                         <div className="inline-flex gap-2 items-center w-full">
                                             <button className="bg-blue-600 py-2 rounded-md w-36" onClick={selectSourcePath}>Select Folder</button>
-                                            <input type="text" onChange={(e) => setSourcePath(e.target.value)} value={sourcePath} className="outline-none border-none p-2 rounded-md placeholder:text-gray-300 bg-[#2C5282] w-full" placeholder="e.g. /home/user/documents" />
+                                            <input readOnly={true} type="text" onChange={(e) => setSourcePath(e.target.value)} value={sourcePath} className="outline-none border-none p-2 rounded-md placeholder:text-gray-300 bg-[#2C5282] w-full" placeholder="e.g. /home/user/documents" autoComplete="off" />
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-start gap-2">
                                         <label htmlFor="path">Destination Path <span className="text-red-500 text-xs align-top">* required</span></label>
                                         <div className="inline-flex gap-2 items-center w-full">
                                             <button className="bg-blue-600 py-2 rounded-md w-36" onClick={selectDestinationPath}>Select Folder</button>
-                                            <input type="text" onChange={(e) => setDestPath(e.target.value)} value={destPath} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. /home/user/documents" />
+                                            <input readOnly={true} type="text" onChange={(e) => setDestPath(e.target.value)} value={destPath} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. /home/user/documents" autoComplete="off" />
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-start gap-2">
                                         <label htmlFor="extensions">Extensions</label>
-                                        <input type="text" onChange={(e) => setExtensions(e.target.value)} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. doc, docx, pdf, xlsx" />
+                                        <input type="text" onChange={(e) => setExtensions(e.target.value)} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. doc, docx, pdf, xlsx" autoComplete="off" />
                                     </div>
                                     <div className="flex flex-col items-start gap-2">
                                         <label htmlFor="regex">Regex</label>
-                                        <input type="text" onChange={(e) => setRegex(e.target.value)} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. ^(?=.*mopper).*\.rs$" />
+                                        <input type="text" onChange={(e) => setRegex(e.target.value)} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. ^(?=.*mopper).*\.rs$" autoComplete="off" />
                                     </div>
                                 </div>
                                 <div className="absolute bottom-6 right-6 mt-auto ml-auto">
@@ -167,29 +174,29 @@ export default function OrganizerModal({ organizer, id, isOpen }: { organizer: a
                                 <div className="flex flex-col 2xl:gap-4 gap-2 3xl:mt-6 mt-2 overflow-y-scroll">
                                     <div className="flex flex-col items-start gap-2">
                                         <label htmlFor="name">Name <span className="text-red-500 text-xs align-top">* required</span></label>
-                                        <input type="text" onChange={(e) => setName(e.target.value)} value={name} className="outline-none bg-[#2C5282] p-2 w-full rounded-md placeholder:text-gray-300 border-none" placeholder="e.g. Documents" />
+                                        <input type="text" onChange={(e) => setName(e.target.value)} value={name} className="outline-none bg-[#2C5282] p-2 w-full rounded-md placeholder:text-gray-300 border-none" placeholder="e.g. Documents"  autoComplete="off"/>
                                     </div>
                                     <div className="flex flex-col items-start gap-2">
                                         <label htmlFor="path">Source Path <span className="text-red-500 text-xs align-top">* required</span></label>
                                         <div className="inline-flex gap-2 items-center w-full">
                                             <button className="bg-blue-600 py-2 rounded-md w-36" onClick={selectSourcePath}>Select Folder</button>
-                                            <input type="text" onChange={(e) => setSourcePath(e.target.value)} value={sourcePath} className="outline-none border-none p-2 rounded-md placeholder:text-gray-300 bg-[#2C5282] w-full" placeholder="e.g. /home/user/documents" />
+                                            <input type="text" onChange={(e) => setSourcePath(e.target.value)} value={sourcePath} className="outline-none border-none p-2 rounded-md placeholder:text-gray-300 bg-[#2C5282] w-full" placeholder="e.g. /home/user/documents" autoComplete="off" />
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-start gap-2">
                                         <label htmlFor="path">Destination Path <span className="text-red-500 text-xs align-top">* required</span></label>
                                         <div className="inline-flex gap-2 items-center w-full">
                                             <button className="bg-blue-600 py-2 rounded-md w-36" onClick={selectDestinationPath}>Select Folder</button>
-                                            <input type="text" onChange={(e) => setDestPath(e.target.value)} value={destPath} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. /home/user/documents" />
+                                            <input type="text" onChange={(e) => setDestPath(e.target.value)} value={destPath} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. /home/user/documents" autoComplete="off" />
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-start gap-2">
                                         <label htmlFor="extensions">Extensions</label>
-                                        <input type="text" onChange={(e) => setExtensions(e.target.value)} value={extensions} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. doc, docx, pdf, xlsx" />
+                                        <input type="text" onChange={(e) => setExtensions(e.target.value)} value={extensions} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. doc, docx, pdf, xlsx" autoComplete="off" />
                                     </div>
                                     <div className="flex flex-col items-start gap-2">
                                         <label htmlFor="regex">Regex</label>
-                                        <input type="text" onChange={(e) => setRegex(e.target.value)} value={regex} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. ^(?=.*mopper).*\.rs$" />
+                                        <input type="text" onChange={(e) => setRegex(e.target.value)} value={regex} className="outline-none border-none p-2 w-full rounded-md placeholder:text-gray-300 bg-[#2C5282]" placeholder="e.g. ^(?=.*mopper).*\.rs$" autoComplete="off" />
                                     </div>
                                     <div className="border border-gray-300 hidden 2xl:block"></div>
                                     <div className="flex-col items-start gap-2 bg-blue-800 rounded-md 3xl:max-h-96 max-h-60 overflow-y-scroll relative hidden 2xl:flex">

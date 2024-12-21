@@ -1,9 +1,10 @@
-import { AlarmClock, X } from "lucide-react";
+import { AlarmClock, Settings, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Icon from "@/assets/icon.svg";
 import Logo from "@/assets/logo.svg";
 import { GitHubLogoIcon, LinkedInLogoIcon } from "@radix-ui/react-icons";
 import { getVersion, getTauriVersion } from "@tauri-apps/api/app";
+import { invoke } from "@tauri-apps/api/core";
 
 export default function SettingsModal({
     isOpen,
@@ -13,13 +14,35 @@ export default function SettingsModal({
     toggle: () => void
 }) {
     // const [isOpen, setIsOpen] = useState(false);
-    const [timerSelected, setTimerSelected] = useState(false);
+    const [settingsSelected, setSettingsSelected] = useState(false);
     const [version, setVersion] = useState("");
     const [tauriVersion, setTauriVersion] = useState("");
+    const [interval, setInterval] = useState(5);
+    const [runOnStartup, setRunOnStartup] = useState(false);
 
-    // const toggleModal = () => setIsOpen(!isOpen);
+    const setConfig = () => {
+        if (interval < 1) {
+            return;
+        }
+        const config = {
+            timer: interval,
+            run_on_startup: runOnStartup
+        }
+        invoke("set_config", { config });
+        document.location.reload();
+    }
+
+    const getConfig = async () => {
+        return invoke('get_config') as Promise<any>;
+    };
 
     useEffect(() => {
+        const fetchConfig = async () => {
+            const { timer, run_on_startup } = await getConfig();
+            setInterval(timer);
+            setRunOnStartup(run_on_startup);
+          };
+          fetchConfig();
         const getMopperVersion = async () => {
             return await getVersion();
         }
@@ -30,7 +53,7 @@ export default function SettingsModal({
         getTauriVersion().then((version) => {
             setTauriVersion(version);
         });
-
+        
     }, []);
 
     return (
@@ -38,14 +61,14 @@ export default function SettingsModal({
             <div className="relative border-2 border-blue-600 bg-blue-900 2xl:w-3/6 2xl:h-5/6 w-4/6 h-full rounded-md">
                 <div className="grid grid-cols-12 h-full">
                     <div className="col-span-3 flex flex-col border-r-2 border-blue-600 h-full w-full">
-                        <button onClick={() => setTimerSelected(false)} className={`inline-flex items-center justify-center h-24 hover:bg-blue-600 ${timerSelected ? "bg-blue-800" : "bg-blue-600"}`}>
+                        <button onClick={() => setSettingsSelected(false)} className={`inline-flex items-center justify-center h-24 hover:bg-blue-600 ${settingsSelected ? "bg-blue-800" : "bg-blue-600"}`}>
                             <div className="inline-flex gap-3 items-center">
                                 <img src={Icon} alt="Mopper Icon" className="w-8 h-8" />
                                 About Mopper
                             </div>
                         </button>
-                        <button onClick={() => setTimerSelected(true)} className={`inline-flex items-center justify-center h-24 hover:bg-blue-600 ${timerSelected ? "bg-blue-600" : "bg-blue-800"}`}>
-                            <AlarmClock className="w-6 h-6 mr-3" /> Timer Settings
+                        <button onClick={() => setSettingsSelected(true)} className={`inline-flex items-center justify-center h-24 hover:bg-blue-600 ${settingsSelected ? "bg-blue-600" : "bg-blue-800"}`}>
+                            <Settings className="w-6 h-6 mr-3" /> Settings
                         </button>
                     </div>
                     <div className="col-span-9 w-full h-full">
@@ -55,10 +78,19 @@ export default function SettingsModal({
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
-                            {timerSelected ? (
+                            {settingsSelected ? (
                                 <>
-                                    <h1 className="text-xl font-bold">Timer Settings</h1>
-                                    <p className="text-sm">Coming soon...</p>
+                                    <h1 className="text-xl font-bold">Settings</h1>
+                                    <div className="flex flex-col gap-3">
+                                        <label htmlFor="interval" className="text-sm">Interval (minutes)</label>
+                                        <input type="number" id="interval" className="p-2 bg-gray-800 text-white rounded-md" value={interval} onChange={(e) => setInterval(parseInt(e.target.value))} />
+                                    </div>
+                                    {/* run app on startup */}
+                                    <div className="flex flex-row-reverse gap-3 items-center mr-auto">
+                                        <label htmlFor="startup" className="text-sm">Run on startup</label>
+                                        <input type="checkbox" id="startup" className="w-5 h-5 bg-gray-800 rounded-sm outline-blue-400" checked={runOnStartup} onChange={(e) => setRunOnStartup(e.target.checked)} />
+                                    </div>
+                                    <button className="p-2 bg-blue-600 text-white hover:bg-blue-500 transition-all rounded-md" onClick={setConfig}>Save</button>
                                 </>
                             ) : (
                                 <>
